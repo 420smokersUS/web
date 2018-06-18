@@ -40,7 +40,7 @@ class IndexPage extends React.Component {
 
     return (
       <React.Fragment>
-        <ThemeContext.Consumer>
+        {/* <ThemeContext.Consumer>
           {theme => (
             <Hero scrollToContent={this.scrollToContent} backgrounds={backgrounds} theme={theme} />
           )}
@@ -59,7 +59,8 @@ class IndexPage extends React.Component {
             margin: 0;
             border: 0;
           }
-        `}</style>
+        `}</style> */}
+        <div>Hello I am Index</div>
       </React.Fragment>
     );
   }

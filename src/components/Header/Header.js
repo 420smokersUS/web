@@ -1,257 +1,133 @@
-import Link from "gatsby-link";
-import PropTypes from "prop-types";
 import React from "react";
-import VisibilitySensor from "react-visibility-sensor";
+import Link from "gatsby-link";
+import styled from "react-emotion";
+import FontAwesomeIcon from "@fortawesome/react-fontawesome";
+// import faBars from "@fortawesome/fontawesome-free-solid/faBars";
+import FaSearch from "@fortawesome/fontawesome-free-solid/faSearch";
+import Logo from "../../../static/icons/420smokers.png";
 
-import { ScreenWidthContext, FontLoadedContext } from "../../layouts";
-import config from "../../../content/meta/config";
-import Menu from "../Menu";
+const HeaderContainer = styled.header`
+  width: 100%;
+  background: #ffffff;
+  color: #000000;
+  border-bottom: 4px solid black;
+  z-index: 9999;
+  font-family: "Montserrat", "Helvetica Neue", Helvetica, sans-serif;
+  position: fixed;
+  top: 0;
+  height: 80px;
+`;
 
-import avatar from "../../images/jpg/avatar.jpg";
+const FlContainer = styled.nav`
+  position: relative;
+  display: table;
+  width: 100%;
+  max-width: 1140px;
+  margin: 0 auto;
+  padding-top: 1em;
+  padding-bottom: 1em;
+`;
 
-class Header extends React.Component {
-  state = {
-    fixed: false
-  };
+// const MenuIcon = styled(FontAwesomeIcon)`
+//   position: relative;
+//   display: block;
+//   float: left;
+//   width: 22px;
+//   height: 63px;
+//   margin-top: 0;
+//   padding: 0;
+//   background-color: transparent !important;
+//   overflow: hidden;
+// `;
 
-  visibilitySensorChange = val => {
-    if (val) {
-      this.setState({ fixed: false });
-    } else {
-      this.setState({ fixed: true });
-    }
-  };
+// const MenuText = styled.div`
+//   display: block;
+//   float: left;
+//   position: relative;
+//   padding: 0 20px;
+//   text-transform: uppercase;
+//   span {
+//     display: block;
+//     font-size: 24px;
+//     line-height: 64px;
+//   }
+// `;
 
-  getHeaderSize = () => {
-    const fixed = this.state.fixed ? "fixed" : "";
-    const homepage = this.props.path === "/" ? "homepage" : "";
-
-    return `${fixed} ${homepage}`;
-  };
-
-  render() {
-    const { pages, path, theme } = this.props;
-    const { fixed } = this.state;
-
-    return (
-      <React.Fragment>
-        <header className={`header ${this.getHeaderSize()}`}>
-          <Link to="/" className="logoType">
-            <div className="logo">
-              <img src={avatar} alt={config.siteTitle} />
-            </div>
-            <div className="type">
-              <h1>{config.headerTitle}</h1>
-              <h2>{config.headerSubTitle}</h2>
-            </div>
-          </Link>
-          <FontLoadedContext.Consumer>
-            {loaded => (
-              <ScreenWidthContext.Consumer>
-                {width => (
-                  <Menu
-                    path={path}
-                    fixed={fixed}
-                    screenWidth={width}
-                    fontLoaded={loaded}
-                    pages={pages}
-                    theme={theme}
-                  />
-                )}
-              </ScreenWidthContext.Consumer>
-            )}
-          </FontLoadedContext.Consumer>
-        </header>
-        <VisibilitySensor onChange={this.visibilitySensorChange}>
-          <div className="sensor" />
-        </VisibilitySensor>
-
-        {/* --- STYLES --- */}
-        <style jsx>{`
-          .header {
-            align-items: center;
-            justify-content: center;
-            background-color: ${theme.color.neutral.white};
-            display: flex;
-            height: ${theme.header.height.default};
-            position: relative;
-            top: 0;
-            width: 100%;
-            align-items: center;
-
-            :global(a.logoType) {
-              align-items: center;
-              display: flex;
-              flex-direction: "column";
-              color: ${theme.text.color.primary};
-
-              .logo {
-                flex-shrink: 0;
-              }
-            }
-
-            &.homepage {
-              position: absolute;
-              background-color: transparent;
-              height: ${theme.header.height.homepage};
-            }
-          }
-
-          h1 {
-            font-size: ${theme.font.size.m};
-            font-weight: ${theme.font.weight.standard};
-            margin: ${theme.space.stack.xs};
-          }
-
-          h2 {
-            font-weight: ${theme.font.weight.standard};
-            font-size: ${theme.font.size.xxs};
-            letter-spacing: 0;
-            margin: 0;
-          }
-
-          .logo {
-            border-radius: 65% 75%;
-            border: 1px solid #eee;
-            display: inline-block;
-            height: 44px;
-            margin: ${theme.space.inline.default};
-            overflow: hidden;
-            width: 44px;
-            transition: all 0.5s;
-
-            .homepage & {
-              height: 60px;
-              width: 60px;
-            }
-
-            img {
-              width: 100%;
-            }
-          }
-
-          .sensor {
-            display: block;
-            position: absolute;
-            bottom: 0;
-            z-index: 1;
-            left: 0;
-            right: 0;
-            height: 1px;
-            top: ${path === "/" ? theme.header.height.homepage : theme.header.height.default};
-          }
-
-          @from-width tablet {
-            .header {
-              padding: ${theme.space.inset.l};
-
-              &.homepage {
-                height: ${theme.header.height.homepage};
-              }
-            }
-          }
-
-          @below desktop {
-            .header.homepage {
-              .logo {
-                border: none;
-              }
-
-              :global(a.logoType),
-              h1 {
-                color: ${theme.color.neutral.white};
-              }
-              h2 {
-                color: ${theme.color.neutral.gray.d};
-              }
-            }
-          }
-
-          @from-width desktop {
-            .header {
-              align-items: center;
-              background-color: ${theme.color.neutral.white};
-              display: flex;
-              position: absolute;
-              top: 0;
-              width: 100%;
-              justify-content: space-between;
-              transition: padding 0.5s;
-
-              &.fixed {
-                height: ${theme.header.height.fixed};
-                background-color: ${theme.color.neutral.white};
-                left: 0;
-                padding: 0 ${theme.space.m};
-                position: fixed;
-                top: 0;
-                width: 100%;
-                z-index: 1;
-
-                h1 {
-                  margin: ${theme.space.stack.xxs};
-                }
-
-                h2 {
-                  display: none;
-                }
-              }
-
-              &.homepage:not(.fixed) {
-                :global(a.logoType),
-                h1 {
-                  color: ${theme.color.neutral.white};
-                }
-                h2 {
-                  color: ${theme.color.neutral.gray.d};
-                }
-              }
-            }
-
-            .header :global(a.logoType) {
-              text-align: left;
-              flex-direction: row;
-              flex-shrink: 0;
-              width: auto;
-            }
-
-            .logo {
-              margin: ${theme.space.inline.default};
-
-              .fixed & {
-                height: 36px;
-                width: 36px;
-              }
-
-              .header.homepage:not(.fixed) & {
-                border: none;
-              }
-            }
-
-            h2 {
-              animation-duration: ${theme.time.duration.default};
-              animation-name: h2Entry;
-            }
-
-            @keyframes h2Entry {
-              from {
-                opacity: 0;
-              }
-              to {
-                opacity: 1;
-              }
-            }
-          }
-        `}</style>
-      </React.Fragment>
-    );
+const TopLogo = styled.div`
+  float: left;
+  margin-right: 20px;
+  overflow: hidden;
+  display: table-cell;
+  vertical-align: middle;
+  width: 10%;
+  img {
+    max-height: 44px;
+    display: table-cell;
+    vertical-align: middle;
   }
-}
+`;
 
-Header.propTypes = {
-  pages: PropTypes.array.isRequired,
-  path: PropTypes.string.isRequired,
-  theme: PropTypes.object.isRequired
-};
+const TopMenu = styled.div`
+  float: left;
+  text-transform: uppercase;
+  display: table-cell;
+  vertical-align: middle;
+  width: 75%;
+  li {
+    position: relative;
+    display: inline-block;
+    margin-left: 1.5rem;
+    margin-right: 1.5rem;
+  }
+`;
+
+const SearchContainer = styled.div`
+  float: left;
+  height: 100%;
+  width: 13%;
+  display: table-cell;
+  vertical-align: middle;
+  svg {
+    float: right;
+  }
+  div {
+    float: left;
+    width: 3rem;
+  }
+`;
+
+const Header = () => (
+  <HeaderContainer>
+    <FlContainer>
+      {/* <div className="mobile-menu"> */}
+      {/* <MenuIcon size="lg" icon={faBars} />
+        <MenuText>
+          <span>menu</span>
+        </MenuText> */}
+      {/* </div> */}
+      <TopLogo>
+        <Link to="/">
+          <img src={Logo} />
+        </Link>
+      </TopLogo>
+      <TopMenu>
+        <ul>
+          <li>Reviews</li>
+          <li>Headshops</li>
+          <li>Growing</li>
+          <li>News</li>
+          <li>Lifestyle</li>
+          <li>Studies</li>
+        </ul>
+      </TopMenu>
+      <SearchContainer>
+        <ul>
+          <div></div>
+          <FontAwesomeIcon size="lg" icon={FaSearch} />
+        </ul>
+      </SearchContainer>
+    </FlContainer>
+  </HeaderContainer>
+);
 
 export default Header;
