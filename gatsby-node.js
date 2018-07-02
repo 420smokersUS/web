@@ -25,107 +25,106 @@ exports.onCreateNode = ({ node, getNode, boundActionCreators }) => {
   }
 };
 
-// exports.createPages = ({ graphql, boundActionCreators }) => {
-//   const { createPage } = boundActionCreators;
+exports.createPages = ({ graphql, boundActionCreators }) => {
+  const { createPage } = boundActionCreators;
 
-//   return new Promise((resolve, reject) => {
-//     const postTemplate = path.resolve("./src/templates/PostTemplate.js");
-//     const pageTemplate = path.resolve("./src/templates/PageTemplate.js");
-//     const categoryTemplate = path.resolve("./src/templates/CategoryTemplate.js");
-//     resolve(
-//       graphql(
-//         `
-//           {
-//             allMarkdownRemark(
-//               filter: { id: { regex: "//posts|pages//" } }
-//               sort: { fields: [fields___prefix], order: DESC }
-//               limit: 1000
-//             ) {
-//               edges {
-//                 node {
-//                   id
-//                   fields {
-//                     slug
-//                     prefix
-//                   }
-//                   frontmatter {
-//                     title
-//                     category
-//                   }
-//                 }
-//               }
-//             }
-//           }
-//         `
-//       ).then(result => {
-//         if (result.errors) {
-//           console.log(result.errors);
-//           reject(result.errors);
-//         }
+  return new Promise((resolve, reject) => {
+    const postTemplate = path.resolve("./src/templates/blog.js");
+    const tagTemplate = path.resolve("./src/pages/blog.js");
+    resolve(
+      graphql(
+        `
+          {
+            allPrismicBlog {
+              edges {
+                node {
+                  id
+                  slugs
+                  data {
+                    section
+                    tags1 {
+                      tag {
+                        document {
+                          data {
+                            tag
+                          }
+                        }
+                      }
+                    }
+                    title {
+                      html
+                      text
+                    }
+                    header_image {
+                      localFile {
+                        id
+                      }
+                    }
+                    text {
+                      html
+                      text
+                    }
+                    date
+                    section
+                  }
+                }
+              }
+            }
+            allPrismicTag {
+              edges {
+                node {
+                  id
+                  data {
+                    tag
+                  }
+                }
+              }
+            }
+          }
+        `
+      ).then(result => {
+        if (result.errors) {
+          console.log(result.errors);
+          reject(result.errors);
+        }
 
-//         const items = result.data.allMarkdownRemark.edges;
-
-//         // Create category list
-//         const categorySet = new Set();
-//         items.forEach(edge => {
-//           const {
-//             node: {
-//               frontmatter: { category }
-//             }
-//           } = edge;
-
-//           if (category && category !== null) {
-//             categorySet.add(category);
-//           }
-//         });
-
-//         // Create category pages
-//         const categoryList = Array.from(categorySet);
-//         categoryList.forEach(category => {
-//           createPage({
-//             path: `/category/${_.kebabCase(category)}/`,
-//             component: categoryTemplate,
-//             context: {
-//               category
-//             }
-//           });
-//         });
-
-//         // Create posts
-//         const posts = items.filter(item => /posts/.test(item.node.id));
-//         posts.forEach(({ node }, index) => {
-//           const slug = node.fields.slug;
-//           const next = index === 0 ? undefined : posts[index - 1].node;
-//           const prev = index === posts.length - 1 ? undefined : posts[index + 1].node;
-
-//           createPage({
-//             path: slug,
-//             component: postTemplate,
-//             context: {
-//               slug,
-//               prev,
-//               next
-//             }
-//           });
-//         });
-
-//         // and pages.
-//         const pages = items.filter(item => /pages/.test(item.node.id));
-//         pages.forEach(({ node }) => {
-//           const slug = node.fields.slug;
-
-//           createPage({
-//             path: slug,
-//             component: pageTemplate,
-//             context: {
-//               slug
-//             }
-//           });
-//         });
-//       })
-//     );
-//   });
-// };
+        const posts = result.data.allPrismicBlog.edges;
+        const tags = result.data.allPrismicTag.edges;
+        const tagsWithPosts = {};
+        posts.forEach(element => {
+          const id = element.node.id;
+          const postTags = element.node.data.tags1;
+          postTags.forEach(postTag => {
+            tags.forEach(tag => {
+              // console.log("Tag, ", postTag.tag.document)
+              if (postTag.tag.document[0].data.tag === tag.node.data.tag) {
+                tagsWithPosts[tag.node.data.tag] = [];
+                tagsWithPosts[tag.node.data.tag].push(id);
+              }
+            });
+          });
+          console.log(tagsWithPosts);
+          createPage({
+            path: `/${element.node.data.section}/${element.node.slugs[0]}`,
+            component: postTemplate,
+            context: {
+              id
+            }
+          });
+        });
+        // tags.forEach(tag => {
+        //   createPage({
+        //     path: `/tag/${tag.node.data.tag}`,
+        //     component: tagTemplate
+        //     // context: {
+        //     //   id
+        //     // }
+        //   });
+        // });
+      })
+    );
+  });
+};
 
 exports.modifyWebpackConfig = ({ config, stage }) => {
   switch (stage) {

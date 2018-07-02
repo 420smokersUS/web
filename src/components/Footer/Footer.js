@@ -4,14 +4,16 @@ import styled from "react-emotion";
 import { SocialIcon } from "react-social-icons";
 
 const MainContainer = styled.div`
+  z-index: 10000;
   width: 100%;
   background-color: black;
   padding: 1.2em;
   div.socialIcons {
+    z-index: 1000;
     border-top-style: solid;
     border-bottom-style: solid;
-    border-top-width: 1px;
-    border-bottom-width: 1px;
+    border-top-width: 0.13em;
+    border-bottom-width: 0.13em;
     border-top-color: white;
     border-bottom-color: white;
     margin: auto;

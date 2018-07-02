@@ -1,8 +1,9 @@
 import React from "react";
 import styled from "react-emotion";
 import Img from "gatsby-image";
-import asyncComponent from "../components/AsyncComponent";
+// import asyncComponent from "../components/AsyncComponent";
 import Share from "../components/Post/Share";
+import Tags from "../components/Post/Tags";
 import themeObjectFromYaml from "../theme/theme.yaml";
 
 // const Share = asyncComponent(() =>
@@ -119,6 +120,7 @@ export default class BlogPage extends React.Component {
               <div dangerouslySetInnerHTML={{__html: data.text.html}} />
             </CenteredComponent>
             <CenteredComponent>
+              <Tags tags={['tag1', 'tag2']} />
               <Share post={this.props.data.prismicBlog} theme={themeObjectFromYaml} />
             </CenteredComponent>
           </MainPart>
@@ -129,8 +131,8 @@ export default class BlogPage extends React.Component {
 }
 
 export const SingleBlogQuery = graphql`
-  query PrismicBlog {
-    prismicBlog {
+  query PrismicBlog($id: String!) {
+    prismicBlog(id: { eq: $id }) {
       uid
       slugs
       id
