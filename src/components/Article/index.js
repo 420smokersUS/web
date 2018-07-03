@@ -1,6 +1,9 @@
 import React from "react";
 import { Flex, Box } from "grid-emotion";
 import styled from "react-emotion";
+import Img from "gatsby-image";
+import Link from "gatsby-link";
+import { Main, Newsletter, Giveaway } from "../Layout";
 
 const Article = styled.div`
   section.title {
@@ -11,55 +14,63 @@ const Article = styled.div`
   }
 `;
 
-const snippet =
-  "The main objective of any cannabis farmer is to grow and produce a high yield with of course a potent fragrant bud.";
-
-export const ArticleBig = () => (
-  <Flex flexWrap="wrap" alignItems="center">
-    <Article>
-      <Box p={1} width={1}>
-        <section className="title">Is Cannabis Good For Your Health?</section>
-      </Box>
-      <Flex flexWrap="wrap" alignItems="center">
-        <Box p={1} width={[1, null, 1 / 2]}>
-          <img src="https://420smokers.us/wp-content/uploads/2017/10/cannabis-garden.jpg" />
+const ArticleBig = ({ data: { title, text, header_image, date, section }, slugs }) => {
+  console.log(slugs);
+  return (
+    <Flex flexWrap="wrap" alignItems="center">
+      <Article>
+        <Box p={1} width={1}>
+          <Link to={`/${section}/${slugs}`}>
+            <section className="title">{title.text}</section>
+          </Link>
         </Box>
-        <Box p={1} width={[1, null, 1 / 2]}>
-          <Flex flexDirection="column">
-            <Box p={1} height={3 / 4}>
-              <div className="snippet">
-                <p>{snippet}</p>
-              </div>
-            </Box>
-            <Box p={1} height={1 / 4}>
-              May 25, 2018 | News
-            </Box>
-          </Flex>
-        </Box>
-      </Flex>
-    </Article>
-  </Flex>
-);
+        <Flex flexWrap="wrap" alignItems="center">
+          <Box p={1} width={[1, null, 1 / 2]}>
+            <Link to={`/${section}/${slugs}`}>
+              <Img sizes={header_image.localFile.childImageSharp.sizes} />
+            </Link>
+          </Box>
+          <Box p={1} width={[1, null, 1 / 2]}>
+            <Flex flexDirection="column">
+              <Box p={1} height={3 / 4}>
+                <div className="snippet">
+                  <p>{`${text.text.slice(0, 250)}...`}</p>
+                </div>
+              </Box>
+              <Box p={1} height={1 / 4}>
+                {date} | <Link to={`/${section}`}>{section}</Link>
+              </Box>
+            </Flex>
+          </Box>
+        </Flex>
+      </Article>
+    </Flex>
+  );
+};
 
-export const ArticleSmall = () => (
+const ArticleSmall = ({ data: { title, text, header_image, date, section }, slugs }) => (
   <Flex className="" flexDirection="column" flexWrap="wrap" alignItems="center">
     <Article>
       <Box p={2}>
-        <img src="https://420smokers.us/wp-content/uploads/2017/10/cannabis-garden.jpg" />
+        <Link to={`/${section}/${slugs}`}>
+          <Img sizes={header_image.localFile.childImageSharp.sizes} />
+        </Link>
       </Box>
       <Box p={1}>
-        <section className="title">Is Cannabis Good For Your Health?</section>
+        <Link to={`/${section}/${slugs}`}>
+          <section className="title">{title.text}</section>
+        </Link>
       </Box>
       <Flex flexWrap="wrap" alignItems="center">
         <Box p={1} height={1 / 2}>
           <Flex flexDirection="column">
             <Box p={1} height={3 / 4}>
               <div className="snippet">
-                <p>{snippet}</p>
+                <p>{`${text.text.slice(0, 200)}...`}</p>
               </div>
             </Box>
             <Box p={1} height={1 / 4}>
-              May 25, 2018 | News
+              {date} | <Link to={`/${section}`}>{section}</Link>
             </Box>
           </Flex>
         </Box>
@@ -67,3 +78,45 @@ export const ArticleSmall = () => (
     </Article>
   </Flex>
 );
+
+const ArticleEl = ({ data, size, slugs }) => {
+  const Component = size ? ArticleBig : ArticleSmall;
+  console.log("Data", data);
+  return <Component data={data} slugs={slugs} />;
+};
+
+export const Blog = ({ posts }) => {
+  const smallArticleWidths = [1, 1 / 2, 1 / 2, 1 / 4]
+  const bigArticleWidths = [1, null, null, 1 / 2]
+  return (
+    <React.Fragment>
+      <Main className="">
+        <Flex flexWrap="wrap" alignItems="center">
+          <Box width={bigArticleWidths}>
+            <ArticleEl size={true} data={posts[0].node.data} slugs={posts[0].node.slugs[0]} />
+          </Box>
+          <Box width={bigArticleWidths}>
+            <ArticleEl size={true} data={posts[0].node.data} slugs={posts[0].node.slugs[0]} />
+          </Box>
+        </Flex>
+        <hr />
+        <Flex flexWrap="wrap" alignItems="center">
+          <Box width={smallArticleWidths}>
+            <ArticleEl data={posts[0].node.data} slugs={posts[0].node.slugs[0]} />
+          </Box>
+          <Box width={smallArticleWidths}>
+            <ArticleEl data={posts[0].node.data} slugs={posts[0].node.slugs[0]} />
+          </Box>
+          <Box width={smallArticleWidths}>
+            <ArticleEl data={posts[0].node.data} slugs={posts[0].node.slugs[0]} />
+          </Box>
+          <Box width={smallArticleWidths}>
+            <ArticleEl data={posts[0].node.data} slugs={posts[0].node.slugs[0]} />
+          </Box>
+        </Flex>
+      </Main>
+      <Giveaway />
+      <Newsletter />
+    </React.Fragment>
+  );
+};

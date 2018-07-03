@@ -30,7 +30,18 @@ exports.createPages = ({ graphql, boundActionCreators }) => {
 
   return new Promise((resolve, reject) => {
     const postTemplate = path.resolve("./src/templates/blog.js");
-    const tagTemplate = path.resolve("./src/pages/blog.js");
+    const tagTemplate = path.resolve("./src/templates/tag-list.js");
+    const sectionTemplate = path.resolve("./src/templates/section.js");
+    const sections = ["growing"];
+    sections.forEach(section => {
+      createPage({
+        path: `/${section}`,
+        component: sectionTemplate,
+        context: {
+          section
+        }
+      });
+    });
     resolve(
       graphql(
         `
@@ -56,8 +67,21 @@ exports.createPages = ({ graphql, boundActionCreators }) => {
                       text
                     }
                     header_image {
+                      url
                       localFile {
-                        id
+                        childImageSharp {
+                          sizes(maxWidth: 800, quality: 85) {
+                            sizes
+                            tracedSVG
+                            aspectRatio
+                            src
+                            srcSet
+                            base64
+                            tracedSVG
+                            srcWebp
+                            srcSetWebp
+                          }
+                        }
                       }
                     }
                     text {
@@ -99,11 +123,10 @@ exports.createPages = ({ graphql, boundActionCreators }) => {
               // console.log("Tag, ", postTag.tag.document)
               if (postTag.tag.document[0].data.tag === tag.node.data.tag) {
                 tagsWithPosts[tag.node.data.tag] = [];
-                tagsWithPosts[tag.node.data.tag].push(id);
+                tagsWithPosts[tag.node.data.tag].push(element);
               }
             });
           });
-          console.log(tagsWithPosts);
           createPage({
             path: `/${element.node.data.section}/${element.node.slugs[0]}`,
             component: postTemplate,
@@ -112,15 +135,15 @@ exports.createPages = ({ graphql, boundActionCreators }) => {
             }
           });
         });
-        // tags.forEach(tag => {
-        //   createPage({
-        //     path: `/tag/${tag.node.data.tag}`,
-        //     component: tagTemplate
-        //     // context: {
-        //     //   id
-        //     // }
-        //   });
-        // });
+        tags.forEach(tag => {
+          createPage({
+            path: `/tag/${tag.node.data.tag}`,
+            component: tagTemplate,
+            context: {
+              posts: tagsWithPosts[tag.node.data.tag]
+            }
+          });
+        });
       })
     );
   });
